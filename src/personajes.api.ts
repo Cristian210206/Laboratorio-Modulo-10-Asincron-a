@@ -10,4 +10,15 @@ export const obtenerPersonajes = async () :Promise<Personajes[]> => {
     } 
 }
 
+export const filtarPersonajes = async (contenidoInput: string) => {
+    const personajesFiltrados:Personajes[] = []
+    const personajes:Personajes[] = await obtenerPersonajes()
+
+    personajes.forEach((personaje) => {
+        if(personaje.nombre.includes(contenidoInput)) {
+            personajesFiltrados.push(personaje)
+        }
+    })
+    return personajesFiltrados
+}
 

@@ -1,4 +1,4 @@
-import { obtenerPersonajes } from "./personajes.api";
+import { filtarPersonajes, obtenerPersonajes } from "./personajes.api";
 import { Personajes } from "./personajes.modelo";
 
 const botonFiltrar = document.getElementById("filtrar")
@@ -44,12 +44,12 @@ const personajesBucle = (personajes:Personajes[], listadoPersonajes:HTMLDivEleme
     });
 }
 
-const personajes = await obtenerPersonajes()
-const pintarPersonajes = (arrayPersonajes:Personajes[]) => {
+const pintarPersonajes = async (personajes: Personajes[]) => {
     const listadoPersonajes = document.getElementById("lista-personajes")
 
     if(listadoPersonajes && listadoPersonajes instanceof HTMLDivElement) {
-        personajesBucle(arrayPersonajes, listadoPersonajes)
+        listadoPersonajes.innerText = ""
+        personajesBucle(personajes, listadoPersonajes)
     } else {
         throw new Error("No se han podido mostrar los personajes");   
     }
@@ -58,31 +58,22 @@ const pintarPersonajes = (arrayPersonajes:Personajes[]) => {
 const sacarDatosInput = () :string => {
     const input = document.getElementById("inputFiltrar")
     if(input && input instanceof HTMLInputElement) {
-        return input.innerText
+        return input.value
     } else {
         throw new Error("No se han podido obtener los datos")
     }
 }
 
-const filtarPersonajes = (contenidoInput: string) => {
-    if(contenidoInput !== "") {
-        const personajesFiltrados:Personajes[] = []
-        personajes.forEach((personaje) => {
-            if(personaje.nombre.includes(contenidoInput)) {
-                personajesFiltrados.push(personaje)
-            }
-        })
-        return pintarPersonajes(personajesFiltrados)
-    } else {
-        return pintarPersonajes(personajes)
-    }
-}
 
 if(botonFiltrar && botonFiltrar instanceof HTMLButtonElement) {
-    botonFiltrar.addEventListener("click", () => {
+    botonFiltrar.addEventListener("click", async () => {
         const datosInput = sacarDatosInput()
-        filtarPersonajes(datosInput)
+        const personajesFiltrados = await filtarPersonajes(datosInput)
+        pintarPersonajes(personajesFiltrados)
     })
 }
 
-document.addEventListener("DOMContentLoaded", () => pintarPersonajes(personajes))
+document.addEventListener("DOMContentLoaded", async () => {
+    const personajes = await obtenerPersonajes()
+    pintarPersonajes(personajes)
+})
